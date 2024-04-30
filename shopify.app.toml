@@ -1,9 +1,9 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "89bd9b490b011c4fbdf1de932d9b9c74"
-name = "outfitplanenr(hesam)"
+name = "outfitplaner-hesam"
 handle = "outfitplanenrhesam"
-application_url = "https://mobility-sussex-nitrogen-fort.trycloudflare.com"
+application_url = "https://winners-gpl-cheque-code.trycloudflare.com"
 embedded = true
 
 [build]
@@ -13,13 +13,13 @@ include_config_on_deploy = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products"
+scopes = "read_products"
 
 [auth]
 redirect_urls = [
-  "https://mobility-sussex-nitrogen-fort.trycloudflare.com/auth/callback",
-  "https://mobility-sussex-nitrogen-fort.trycloudflare.com/auth/shopify/callback",
-  "https://mobility-sussex-nitrogen-fort.trycloudflare.com/api/auth/callback"
+  "https://winners-gpl-cheque-code.trycloudflare.com/auth/callback",
+  "https://winners-gpl-cheque-code.trycloudflare.com/auth/shopify/callback",
+  "https://winners-gpl-cheque-code.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

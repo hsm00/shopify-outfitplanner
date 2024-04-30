@@ -1,6 +1,7 @@
 import "@shopify/shopify-app-remix/adapters/node";
 import {
   ApiVersion,
+  LATEST_API_VERSION,
   AppDistribution,
   DeliveryMethod, LogSeverity,
   shopifyApp,
@@ -8,6 +9,8 @@ import {
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import { restResources } from "@shopify/shopify-api/rest/admin/2024-04";
 import prisma from "./db.server";
+
+console.log("process.env.SHOPIFY_API_KEY", process.env.SHOPIFY_API_KEY, process.env.SHOPIFY_API_SECRET, process.env.SCOPES, process.env.SHOPIFY_APP_URL, process.env.SHOP_CUSTOM_DOMAIN)
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
