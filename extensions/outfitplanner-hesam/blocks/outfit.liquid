@@ -44,7 +44,14 @@
 </div>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/app/outfit')
+    fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/app/outfit', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Access-Token': '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',
+      }
+
+    })
       .then(response => response.json())
       .then(data => {
         const outfitNameElement = document.getElementById('outfit-name');

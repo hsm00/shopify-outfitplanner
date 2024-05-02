@@ -3,7 +3,7 @@
 client_id = "89bd9b490b011c4fbdf1de932d9b9c74"
 name = "outfitplaner-hesam"
 handle = "outfitplanenrhesam"
-application_url = "https://uni-heritage-injured-piano.trycloudflare.com"
+application_url = "https://disks-wanna-dim-dry.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,16 +17,16 @@ scopes = "read_products,write_products"
 
 [auth]
 redirect_urls = [
-  "https://uni-heritage-injured-piano.trycloudflare.com/auth/callback",
-  "https://uni-heritage-injured-piano.trycloudflare.com/auth/shopify/callback",
-  "https://uni-heritage-injured-piano.trycloudflare.com/api/auth/callback"
+  "https://disks-wanna-dim-dry.trycloudflare.com/auth/callback",
+  "https://disks-wanna-dim-dry.trycloudflare.com/auth/shopify/callback",
+  "https://disks-wanna-dim-dry.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
 api_version = "2024-04"
 
 [app_proxy]
-url = "https://uni-heritage-injured-piano.trycloudflare.com"
+url = "https://disks-wanna-dim-dry.trycloudflare.com"
 subpath = "outfitplaner-hesam"
 prefix = "apps"
 
