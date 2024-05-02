@@ -14,10 +14,10 @@ export const loader = async ({ request }) => {
   const accessoriesName = "Watch"
   const accessoriesImageUrl = "https://cdn.shopify.com/s/files/1/0645/0328/3870/products/snowboard_wax.png?v=1708976930&width=713"
 
-  const { storefront } = await unauthenticated.storefront(
-    'hesams-outfitplanner.myshopify.com'
-  );
-  console.log("storefront", storefront)
+  console.log("REQUEST", request);
+  const { admin } = await authenticate.admin(request);
+
+  console.log(admin);
 
   const outfit = await db.outfit.findMany(
     {
@@ -28,7 +28,7 @@ export const loader = async ({ request }) => {
     }
   )
 
-  const response = await storefront.graphql(
+  const response = await admin.graphql(
     `#graphql
   query getProductById($id: ID!) {
     product(id: $id) {
@@ -41,6 +41,8 @@ export const loader = async ({ request }) => {
       }
     }
   );
+
+    console.log(response);
 
   const userId = outfit[0].userId;
   const shopUrl = outfit[0].shop;

@@ -44,7 +44,7 @@
 </div>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/api/outfit')
+    fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/app/outfit')
       .then(response => response.json())
       .then(data => {
         const outfitNameElement = document.getElementById('outfit-name');
