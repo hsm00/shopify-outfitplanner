@@ -6,36 +6,31 @@
   </div>
   <div id="outfit-items">
     <div class="outfit-item">
-      <div class="item-image">
-        <img id="hat-image" alt="Hat" width="100" height="100">
+      <div class="item-image" id="hat-image-container">
         <h3>Hat</h3>
       </div>
       <p id="hat-name"></p>
     </div>
     <div class="outfit-item">
-      <div class="item-image">
-        <img id="top-image" alt="Top" width="100" height="100">
+      <div class="item-image" id="top-image-container">
         <h3>Top</h3>
       </div>
       <p id="top-name"></p>
     </div>
     <div class="outfit-item">
-      <div class="item-image">
-        <img id="pants-image" alt="Pants" width="100" height="100">
+      <div class="item-image" id="pants-image-container">
         <h3>Pants</h3>
       </div>
       <p id="pants-name"></p>
     </div>
     <div class="outfit-item">
-      <div class="item-image">
-        <img id="accessories-image" alt="Accessories" width="100" height="100">
+      <div class="item-image" id="accessories-image-container">
         <h3>Accessories</h3>
       </div>
       <p id="accessories-name"></p>
     </div>
     <div class="outfit-item">
-      <div class="item-image">
-        <img id="shoes-image" alt="Shoes" width="100" height="100">
+      <div class="item-image" id="shoes-image-container">
         <h3>Shoes</h3>
       </div>
       <p id="shoes-name"></p>
@@ -43,44 +38,97 @@
   </div>
 </div>
 <script>
+  const customerId = '{{ customer.id }}'
   document.addEventListener('DOMContentLoaded', () => {
-    fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/app/outfit', {
+    fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/app/outfit?customerId={{customer.id}}', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': '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',
-      }
-
+      },
     })
       .then(response => response.json())
       .then(data => {
         const outfitNameElement = document.getElementById('outfit-name');
         const outfitDescriptionElement = document.getElementById('outfit-description');
-        const pantsImageElement = document.getElementById('pants-image');
         const pantsNameElement = document.getElementById('pants-name');
-        const topImageElement = document.getElementById('top-image');
         const topNameElement = document.getElementById('top-name');
-        const shoesImageElement = document.getElementById('shoes-image');
         const shoesNameElement = document.getElementById('shoes-name');
-        const accessoriesImageElement = document.getElementById('accessories-image');
         const accessoriesNameElement = document.getElementById('accessories-name');
 
-        outfitNameElement.textContent = data.name;
-        outfitDescriptionElement.textContent = data.description;
-        pantsImageElement.src = data.pants_image_url;
-        pantsNameElement.textContent = data.pants_name;
-        topImageElement.src = data.top_image_url;
-        topNameElement.textContent = data.top_name;
-        shoesImageElement.src = data.shoes_image_url;
-        shoesNameElement.textContent = data.shoes_name;
-        accessoriesImageElement.src = data.accessories_image_url;
-        accessoriesNameElement.textContent = data.accessories_name;
+        console.log(data);
+        outfitNameElement.textContent = data.outfitName;
+        outfitDescriptionElement.textContent = data.outfitDescription;
+
+        if (data.hatImage) {
+          const hatImageContainer = document.getElementById('hat-image-container');
+          const hatImage = document.createElement('img');
+          hatImage.src = data.hatImage;
+          hatImage.alt = 'Hat';
+          hatImage.width = 100;
+          hatImage.height = 100;
+          hatImageContainer.appendChild(hatImage);
+        } else {
+          document.getElementById('hat-name').textContent = 'No product yet';
+        }
+
+        if (data.pantsImage) {
+          const pantsImageContainer = document.getElementById('pants-image-container');
+          const pantsImage = document.createElement('img');
+          pantsImage.src = data.pantsImage;
+          pantsImage.alt = 'Pants';
+          pantsImage.width = 100;
+          pantsImage.height = 100;
+          pantsImageContainer.appendChild(pantsImage);
+          pantsNameElement.innerHTML = `<a href="${data.pantsStoreUrl}" target="_blank">${data.pantsTitle}</a>`;
+        } else {
+          pantsNameElement.textContent = 'No product yet';
+        }
+
+        if (data.topImage) {
+          const topImageContainer = document.getElementById('top-image-container');
+          const topImage = document.createElement('img');
+          topImage.src = data.topImage;
+          topImage.alt = 'Top';
+          topImage.width = 100;
+          topImage.height = 100;
+          topImageContainer.appendChild(topImage);
+          topNameElement.innerHTML = `<a href="${data.topStoreUrl}" target="_blank">${data.topTitle}</a>`;
+        } else {
+          topNameElement.textContent = 'No product yet';
+        }
+
+        if (data.shoesImage) {
+          const shoesImageContainer = document.getElementById('shoes-image-container');
+          const shoesImage = document.createElement('img');
+          shoesImage.src = data.shoesImage;
+          shoesImage.alt = 'Shoes';
+          shoesImage.width = 100;
+          shoesImage.height = 100;
+          shoesImageContainer.appendChild(shoesImage);
+          shoesNameElement.innerHTML = `<a href="${data.shoeStoreUrl}" target="_blank">${data.shoeTitle}</a>`;
+        } else {
+          shoesNameElement.textContent = 'No product yet';
+        }
+
+        if (data.accessoryImage) {
+          const accessoriesImageContainer = document.getElementById('accessories-image-container');
+          const accessoriesImage = document.createElement('img');
+          accessoriesImage.src = data.accessoryImage;
+          accessoriesImage.alt = 'Accessories';
+          accessoriesImage.width = 100;
+          accessoriesImage.height = 100;
+          accessoriesImageContainer.appendChild(accessoriesImage);
+          accessoriesNameElement.innerHTML = `<a href="${data.accessoryStoreUrl}" target="_blank">${data.accessoryTitle}</a>`;
+        } else {
+          accessoriesNameElement.textContent = 'No product yet';
+        }
       })
       .catch(error => {
         console.error('Error:', error);
       });
   });
 </script>
+
 
 <style>
   #outfit-container {
@@ -186,4 +234,3 @@
   ]
 }
 {% endschema %}
-
