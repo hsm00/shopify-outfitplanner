@@ -8,6 +8,7 @@ const getProductById = async (admin, id) => {
   const response = await admin.graphql(`
     query getProductById($id: ID!) {
       product(id: $id) {
+        id,
         title,
         onlineStorePreviewUrl,
         featuredImage {
@@ -15,7 +16,7 @@ const getProductById = async (admin, id) => {
         },
       }
     }
-  `, { variables: { id } });
+  `, { variables: { id: `gid://shopify/Product/${id}` } });
   const productJson = await response.json();
   return productJson.data.product;
 };
@@ -25,7 +26,6 @@ export const loader = async ({ request }) => {
   const url = new URL(request.url);
   const customerId = url.searchParams.get('customerId');
   try {
-    console.log("customerId", customerId);
     const { admin } = await unauthenticated.admin(shop);
 
     const outfit = await db.outfit.findUnique({
@@ -47,20 +47,22 @@ export const loader = async ({ request }) => {
       getProductById(admin, accessoriesId)
     ]);
 
-
-    console.log("acce", accessory);
     return json({
       outfitName: name,
       outfitDescription: description,
+      topId: top?.id,
       topTitle: top?.title,
       topStoreUrl: top?.onlineStorePreviewUrl,
       topImage: top?.featuredImage?.url,
+      pantsId: pants?.id,
       pantsTitle: pants?.title,
       pantsStoreUrl: pants?.onlineStorePreviewUrl,
       pantsImage: pants?.featuredImage?.url,
+      shoeId: shoe?.id,
       shoeTitle: shoe?.title,
       shoeStoreUrl: shoe?.onlineStorePreviewUrl,
       shoeImage: shoe?.featuredImage?.url,
+      accessoryId: accessory?.id,
       accessoryTitle: accessory?.title,
       accessoryStoreUrl: accessory?.onlineStorePreviewUrl,
       accessoryImage: accessory?.featuredImage?.url,
@@ -68,5 +70,32 @@ export const loader = async ({ request }) => {
   } catch (err) {
     console.error(err);
     return json({ error: "An error occurred while fetching outfit details." }, 500);
+  }
+};
+
+export const action = async ({ request }) => {
+  const shop = "hesams-outfitplanner.myshopify.com";
+  const requestData = await request.json();
+  const customerId = requestData.customerId;
+  const newName = requestData.newName;
+  const newDescription = requestData.newDescription;
+
+  try {
+    const outfit = await db.outfit.updateMany({
+      where: {
+        AND: {
+          userId: customerId,
+          shop,
+        },
+      },
+      data: {
+        name: newName,
+        description: newDescription,
+      },
+    });
+    return json({ message: "Outfit updated successfully" });
+  } catch (err) {
+    console.error(err);
+    return json({ error: "An error occurred while updating the outfit." }, 500);
   }
 };

@@ -1,8 +1,16 @@
 <div id="outfit-container">
   <div id="outfit-details">
     <h2>Outfit Details</h2>
-    <p>Name: <span id="outfit-name"></span></p>
-    <p>Description: <span id="outfit-description"></span></p>
+    <div id="display-mode">
+      <p>Name: <span id="outfit-name"></span></p>
+      <p>Description: <span id="outfit-description"></span></p>
+    </div>
+    <div id="edit-mode" style="display: none;">
+      <input type="text" id="outfit-name-input">
+      <textarea id="outfit-description-input"></textarea>
+      <button id="save-btn">Save</button>
+    </div>
+    <button id="edit-btn">Edit</button>
   </div>
   <div id="outfit-items">
     <div class="outfit-item">
@@ -40,6 +48,58 @@
 <script>
   const customerId = '{{ customer.id }}'
   document.addEventListener('DOMContentLoaded', () => {
+    const outfitNameSpan = document.getElementById('outfit-name');
+    const outfitDescriptionSpan = document.getElementById('outfit-description');
+    const editBtn = document.getElementById('edit-btn');
+    const saveBtn = document.getElementById('save-btn');
+    const editModeDiv = document.getElementById('edit-mode');
+    const displayModeDiv = document.getElementById('display-mode');
+    const outfitNameInput = document.getElementById('outfit-name-input');
+    const outfitDescriptionInput = document.getElementById('outfit-description-input');
+
+    editBtn.addEventListener('click', () => {
+      editModeDiv.style.display = 'block';
+      displayModeDiv.style.display = 'none';
+      saveBtn.style.display = 'block';
+      outfitNameInput.value = outfitNameSpan.textContent;
+      outfitDescriptionInput.value = outfitDescriptionSpan.textContent;
+    });
+
+    // Event listener for the save button
+    saveBtn.addEventListener('click', () => {
+      const newName = outfitNameInput.value;
+      const newDescription = outfitDescriptionInput.value;
+
+      fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/app/outfit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerId,
+          newName,
+          newDescription,
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Updated:', data);
+          // Optionally, you can provide feedback to the user that the update was successful
+
+          // Switch back to display mode
+          editModeDiv.style.display = 'none';
+          displayModeDiv.style.display = 'block';
+          saveBtn.style.display = 'none';
+          outfitNameSpan.textContent = newName;
+          outfitDescriptionSpan.textContent = newDescription;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          // Optionally, provide error feedback to the user
+        });
+    });
+
+    console.log('customerId:', {{ customer.id }});
     fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/app/outfit?customerId={{customer.id}}', {
       method: 'GET',
       headers: {
@@ -97,10 +157,10 @@
           topNameElement.textContent = 'No product yet';
         }
 
-        if (data.shoesImage) {
+        if (data.shoeImage) {
           const shoesImageContainer = document.getElementById('shoes-image-container');
           const shoesImage = document.createElement('img');
-          shoesImage.src = data.shoesImage;
+          shoesImage.src = data.shoeImage;
           shoesImage.alt = 'Shoes';
           shoesImage.width = 100;
           shoesImage.height = 100;
@@ -127,6 +187,7 @@
         console.error('Error:', error);
       });
   });
+
 </script>
 
 

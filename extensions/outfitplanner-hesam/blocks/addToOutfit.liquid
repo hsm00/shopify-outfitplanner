@@ -1,0 +1,263 @@
+<div>
+  <div id="button-container"></div>
+  <div id="outfit-preview" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);">
+    <div class="outfit-preview-header">
+      <h3>Outfit Preview</h3>
+      <button id="close-preview">&#10005;</button>
+    </div>
+    <div class="outfit-items-container">
+      <div class="outfit-main-items">
+        <div id="top-container" class="outfit-item" data-product-id="" data-type="top">
+          <img src="https://via.placeholder.com/100x100?text=Top" alt="Top Placeholder" class="outfit-image">
+          <p class="outfit-title">Top</p>
+        </div>
+        <div id="pants-container" class="outfit-item" data-product-id="" data-type="pant">
+          <img src="https://via.placeholder.com/100x100?text=Pants" alt="Pants Placeholder" class="outfit-image">
+          <p class="outfit-title">Pants</p>
+        </div>
+        <div id="shoe-container" class="outfit-item" data-product-id="" data-type="shoe">
+          <img src="https://via.placeholder.com/100x100?text=Shoe" alt="Shoe Placeholder" class="outfit-image">
+          <p class="outfit-title">Shoe</p>
+        </div>
+      </div>
+      <div id="accessory-container" class="outfit-item" data-product-id="" data-type="accessory">
+        <img src="https://via.placeholder.com/100x100?text=Accessory" alt="Accessory Placeholder" class="outfit-image">
+        <p class="outfit-title">Accessory</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .outfit-items-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .outfit-main-items {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 20px;
+  }
+
+  .outfit-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .outfit-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+  }
+
+  .outfit-title {
+    margin-top: 5px;
+    font-size: 14px;
+  }
+
+  .outfit-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  #close-preview {
+    font-size: 20px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  #outfit-preview {
+    padding: 20px;
+    background-color: white;
+    border-radius: 5px;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  .outfit-button {
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  const productId = `gid://shopify/Product/{{ product.id }}`;
+  const productIdRaw = '{{ product.id }}';
+  const customerId = '{{ customer.id }}';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    fetch(`https://{{ shop.domain }}/apps/outfitplaner-hesam/app/outfit?customerId=${customerId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        const buttonContainer = document.getElementById('button-container');
+        const outfitPreview = document.getElementById('outfit-preview');
+        const closePreviewButton = document.getElementById('close-preview');
+
+        const isProductInOutfit =
+          productId === data.topId ||
+          productId === data.pantsId ||
+          productId === data.shoeId ||
+          productId === data.accessoryId;
+
+        if (isProductInOutfit) {
+          const removeButton = document.createElement('button');
+          removeButton.classList.add('outfit-button', 'remove-from-outfit');
+          removeButton.textContent = 'Remove from Outfit';
+          buttonContainer.appendChild(removeButton);
+
+          removeButton.addEventListener('click', () => {
+            fetch(`https://{{ shop.domain }}/apps/outfitplaner-hesam/app/pdp/remove`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ customerId, productId: productIdRaw }),
+            })
+              .then(response => response.json())
+              .then(data => {
+                console.log(data.message);
+                window.location.reload();
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+          });
+        } else {
+          const addButton = document.createElement('button');
+          addButton.classList.add('outfit-button', 'add-to-outfit');
+          addButton.textContent = 'Add to Outfit';
+          buttonContainer.appendChild(addButton);
+
+          addButton.addEventListener('click', () => {
+            outfitPreview.style.display = 'block';
+            renderOutfitPreview(data);
+          });
+        }
+
+        closePreviewButton.addEventListener('click', () => {
+          outfitPreview.style.display = 'none';
+        });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  });
+
+  function renderOutfitPreview(data) {
+    const topContainer = document.getElementById('top-container');
+    const pantsContainer = document.getElementById('pants-container');
+    const shoeContainer = document.getElementById('shoe-container');
+    const accessoryContainer = document.getElementById('accessory-container');
+
+    // Render top
+    const topImage = topContainer.querySelector('img');
+    const topTitle = topContainer.querySelector('p');
+    if (data.topImage) {
+      topImage.src = data.topImage;
+      topImage.alt = 'Top';
+    } else {
+      topImage.src = 'https://via.placeholder.com/100x100?text=Top';
+      topImage.alt = 'Top Placeholder';
+    }
+    topTitle.textContent = 'Top';
+    topContainer.dataset.productId = data.topId; // Set product ID to the dataset
+
+
+    // Render pants
+    const pantsImage = pantsContainer.querySelector('img');
+    const pantsTitle = pantsContainer.querySelector('p');
+    if (data.pantsImage) {
+      pantsImage.src = data.pantsImage;
+      pantsImage.alt = 'Pants';
+    } else {
+      pantsImage.src = 'https://via.placeholder.com/100x100?text=Pants';
+      pantsImage.alt = 'Pants Placeholder';
+    }
+    pantsTitle.textContent = 'Pants';
+    pantsContainer.dataset.productId = data.pantsId; // Set product ID to the dataset
+    // Render shoe
+    const shoeImage = shoeContainer.querySelector('img');
+    const shoeTitle = shoeContainer.querySelector('p');
+    if (data.shoeImage) {
+      shoeImage.src = data.shoeImage;
+      shoeImage.alt = 'Shoe';
+    } else {
+      shoeImage.src = 'https://via.placeholder.com/100x100?text=Shoe';
+      shoeImage.alt = 'Shoe Placeholder';
+    }
+    shoeTitle.textContent = 'Shoe';
+    shoeContainer.dataset.productId = data.shoeId; // Set product ID to the dataset
+
+    // Render accessory
+    const accessoryImage = accessoryContainer.querySelector('img');
+    const accessoryTitle = accessoryContainer.querySelector('p');
+    if (data.accessoryImage) {
+      accessoryImage.src = data.accessoryImage;
+      accessoryImage.alt = 'Accessory';
+    } else {
+      accessoryImage.src = 'https://via.placeholder.com/100x100?text=Accessory';
+      accessoryImage.alt = 'Accessory Placeholder';
+    }
+    accessoryTitle.textContent = 'Accessory';
+    accessoryContainer.dataset.productId = data.accessoryId; // Set product ID to the dataset
+    console.log(  "sadasd",  accessoryContainer.dataset.productId);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const productContainers = document.querySelectorAll('.outfit-item');
+
+    productContainers.forEach(container => {
+      container.addEventListener('click', () => {
+        const productId = container.dataset.productId; // Get the product ID from the dataset
+        const productType = container.dataset.type;
+        addToOutfit(productId, productType);
+      });
+    });
+  });
+
+  function addToOutfit(productId, productType) {
+    console.log('Adding product to outfit:', productId);
+    fetch(`https://{{ shop.domain }}/apps/outfitplaner-hesam/app/pdp/add`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ customerId, productId, productType}), // Include customer ID and product ID in the body
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data.message);
+        // Optionally, you can update UI or display a message to the user
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
+</script>
+
+{% schema %}
+{
+  "name": "addToButton",
+  "target": "section",
+  "settings": [
+    { "type": "product", "id": "product", "label": "product", "autofill": true },
+    { "type": "color", "id": "colour", "label": "Star Colour", "default": "#ff0000" }
+  ]
+}
+{% endschema %}
