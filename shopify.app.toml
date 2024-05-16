@@ -3,7 +3,7 @@
 client_id = "89bd9b490b011c4fbdf1de932d9b9c74"
 name = "outfitplaner-hesam"
 handle = "outfitplanenrhesam"
-application_url = "https://strap-eyed-material-vatican.trycloudflare.com"
+application_url = "https://screenshots-turkish-squad-sunday.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,16 +17,16 @@ scopes = "read_products,write_products"
 
 [auth]
 redirect_urls = [
-  "https://strap-eyed-material-vatican.trycloudflare.com/auth/callback",
-  "https://strap-eyed-material-vatican.trycloudflare.com/auth/shopify/callback",
-  "https://strap-eyed-material-vatican.trycloudflare.com/api/auth/callback"
+  "https://screenshots-turkish-squad-sunday.trycloudflare.com/auth/callback",
+  "https://screenshots-turkish-squad-sunday.trycloudflare.com/auth/shopify/callback",
+  "https://screenshots-turkish-squad-sunday.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
 api_version = "2024-04"
 
 [app_proxy]
-url = "https://strap-eyed-material-vatican.trycloudflare.com"
+url = "https://screenshots-turkish-squad-sunday.trycloudflare.com"
 subpath = "outfitplaner-hesam"
 prefix = "apps"
 

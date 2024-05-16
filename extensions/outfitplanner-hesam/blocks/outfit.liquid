@@ -1,297 +1,407 @@
-<div id="outfit-container">
-  <div id="outfit-details">
-    <h2>Outfit Details</h2>
-    <div id="display-mode">
-      <p>Name: <span id="outfit-name"></span></p>
-      <p>Description: <span id="outfit-description"></span></p>
+  <div id="outfit-container">
+    <div id="outfit-details">
+      <h2>Outfit Details</h2>
+      <div id="display-mode">
+        <p>Name: <span id="outfit-name"></span></p>
+        <p>Description: <span id="outfit-description"></span></p>
+      </div>
+      <div id="edit-mode" style="display: none;">
+        <input type="text" id="outfit-name-input" placeholder="Enter outfit name">
+        <textarea id="outfit-description-input" placeholder="Enter outfit description"></textarea>
+        <button id="save-btn" class="btn btn-primary">Save</button>
+      </div>
+      <button id="edit-btn" class="btn btn-secondary">Edit</button>
     </div>
-    <div id="edit-mode" style="display: none;">
-      <input type="text" id="outfit-name-input">
-      <textarea id="outfit-description-input"></textarea>
-      <button id="save-btn">Save</button>
+    <div id="outfit-items">
+      <div class="outfit-item">
+        <div class="item-image" id="hat-image-container" data-product-id="">
+          <h3>Hat</h3>
+        </div>
+        <p id="hat-name"></p>
+      </div>
+      <div class="outfit-item">
+        <div class="item-image" id="top-image-container" data-product-id="">
+          <h3>Top</h3>
+        </div>
+        <p id="top-name"></p>
+      </div>
+      <div class="outfit-item">
+        <div class="item-image" id="pants-image-container" data-product-id="">
+          <h3>Pants</h3>
+        </div>
+        <p id="pants-name"></p>
+      </div>
+      <div class="outfit-item">
+        <div class="item-image" id="accessories-image-container" data-product-id="">
+          <h3>Accessories</h3>
+        </div>
+        <p id="accessories-name"></p>
+      </div>
+      <div class="outfit-item">
+        <div class="item-image" id="shoes-image-container" data-product-id="">
+          <h3>Shoes</h3>
+        </div>
+        <p id="shoes-name"></p>
+      </div>
     </div>
-    <button id="edit-btn">Edit</button>
   </div>
-  <div id="outfit-items">
-    <div class="outfit-item">
-      <div class="item-image" id="hat-image-container">
-        <h3>Hat</h3>
-      </div>
-      <p id="hat-name"></p>
-    </div>
-    <div class="outfit-item">
-      <div class="item-image" id="top-image-container">
-        <h3>Top</h3>
-      </div>
-      <p id="top-name"></p>
-    </div>
-    <div class="outfit-item">
-      <div class="item-image" id="pants-image-container">
-        <h3>Pants</h3>
-      </div>
-      <p id="pants-name"></p>
-    </div>
-    <div class="outfit-item">
-      <div class="item-image" id="accessories-image-container">
-        <h3>Accessories</h3>
-      </div>
-      <p id="accessories-name"></p>
-    </div>
-    <div class="outfit-item">
-      <div class="item-image" id="shoes-image-container">
-        <h3>Shoes</h3>
-      </div>
-      <p id="shoes-name"></p>
-    </div>
-  </div>
-</div>
-<script>
-  const customerId = '{{ customer.id }}'
-  document.addEventListener('DOMContentLoaded', () => {
-    const outfitNameSpan = document.getElementById('outfit-name');
-    const outfitDescriptionSpan = document.getElementById('outfit-description');
-    const editBtn = document.getElementById('edit-btn');
-    const saveBtn = document.getElementById('save-btn');
-    const editModeDiv = document.getElementById('edit-mode');
-    const displayModeDiv = document.getElementById('display-mode');
-    const outfitNameInput = document.getElementById('outfit-name-input');
-    const outfitDescriptionInput = document.getElementById('outfit-description-input');
 
-    editBtn.addEventListener('click', () => {
-      editModeDiv.style.display = 'block';
-      displayModeDiv.style.display = 'none';
-      saveBtn.style.display = 'block';
-      outfitNameInput.value = outfitNameSpan.textContent;
-      outfitDescriptionInput.value = outfitDescriptionSpan.textContent;
-    });
 
-    // Event listener for the save button
-    saveBtn.addEventListener('click', () => {
-      const newName = outfitNameInput.value;
-      const newDescription = outfitDescriptionInput.value;
+  <style>
+    #outfit-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
 
-      fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/app/outfit', {
-        method: 'POST',
+    #outfit-details {
+      flex-basis: 30%;
+      background-color: #f5f5f5;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #outfit-items {
+      flex-basis: 65%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 20px;
+    }
+
+    .outfit-item {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .item-image {
+      width: 100%;
+      height: 300px;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+
+    .item-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .outfit-item h3 {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-secondary {
+      background-color: #6c757d;
+      color: #fff;
+      border: none;
+    }
+
+    .btn-secondary:hover {
+      background-color: #494f54;
+    }
+
+
+    .remove-product-button {
+      background-color: transparent;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      #outfit-container {
+        flex-direction: column;
+      }
+
+      #outfit-details{
+        margin-bottom: 2px;
+      }
+
+      #outfit-details,
+      #outfit-items {
+        flex-basis: 100%;
+        margin-top: 10px;
+      }
+
+      #outfit-items {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      #outfit-items {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+
+  <script>
+    const customerId = '{{ customer.id }}'
+    document.addEventListener('DOMContentLoaded', () => {
+      const outfitNameSpan = document.getElementById('outfit-name');
+      const outfitDescriptionSpan = document.getElementById('outfit-description');
+      const editBtn = document.getElementById('edit-btn');
+      const saveBtn = document.getElementById('save-btn');
+      const editModeDiv = document.getElementById('edit-mode');
+      const displayModeDiv = document.getElementById('display-mode');
+      const outfitNameInput = document.getElementById('outfit-name-input');
+      const outfitDescriptionInput = document.getElementById('outfit-description-input');
+        const removeButtons = document.querySelectorAll('.remove-product-button');
+      function addRemoveButton(container) {
+        const removeButton = document.createElement('button');
+        removeButton.className = 'remove-product-button';
+        removeButton.innerHTML = '&#10005;';
+
+        // Insert the remove button as the first child
+        container.insertBefore(removeButton, container.firstChild);
+
+        removeButton.addEventListener('click', () => {
+          // Extract necessary information
+          const parentOutfitItem = removeButton.closest('.item-image');
+          const productId = parentOutfitItem.dataset.productId; // Get the product ID from the dataset
+
+          console.log('productId:', productId);
+
+          // Send POST request
+          fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/app/pdp/remove', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              customerId,
+              productId,
+            }),
+          })
+            .then(response => response.json())
+            .then(data => {
+              console.log('Product removed:', data);
+              window.location.reload();
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              // Optionally, provide error feedback to the user
+            });
+        });
+      }
+      editBtn.addEventListener('click', () => {
+        editModeDiv.style.display = 'block';
+        displayModeDiv.style.display = 'none';
+        saveBtn.style.display = 'block';
+        editBtn.style.display = 'none';
+        outfitNameInput.value = outfitNameSpan.textContent;
+        outfitDescriptionInput.value = outfitDescriptionSpan.textContent;
+      });
+
+      // Event listener for the save button
+      saveBtn.addEventListener('click', () => {
+        const newName = outfitNameInput.value;
+        const newDescription = outfitDescriptionInput.value;
+
+        fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/app/outfit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            customerId,
+            newName,
+            newDescription,
+          }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Updated:', data);
+            // Optionally, you can provide feedback to the user that the update was successful
+
+            // Switch back to display mode
+            editModeDiv.style.display = 'none';
+            displayModeDiv.style.display = 'block';
+            saveBtn.style.display = 'none';
+            outfitNameSpan.textContent = newName;
+            outfitDescriptionSpan.textContent = newDescription;
+            editBtn.style.display = 'block';
+
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            // Optionally, provide error feedback to the user
+          });
+      });
+
+      console.log('customerId:', {{ customer.id }});
+      fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/app/outfit?customerId={{customer.id}}', {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          customerId,
-          newName,
-          newDescription,
-        }),
       })
         .then(response => response.json())
         .then(data => {
-          console.log('Updated:', data);
-          // Optionally, you can provide feedback to the user that the update was successful
+          const outfitNameElement = document.getElementById('outfit-name');
+          const outfitDescriptionElement = document.getElementById('outfit-description');
+          const pantsNameElement = document.getElementById('pants-name');
+          const topNameElement = document.getElementById('top-name');
+          const shoesNameElement = document.getElementById('shoes-name');
+          const accessoriesNameElement = document.getElementById('accessories-name');
+          const hatNameElement = document.getElementById('hat-name');
+          console.log(data);
+          outfitNameElement.textContent = data.outfitName;
+          outfitDescriptionElement.textContent = data.outfitDescription;
 
-          // Switch back to display mode
-          editModeDiv.style.display = 'none';
-          displayModeDiv.style.display = 'block';
-          saveBtn.style.display = 'none';
-          outfitNameSpan.textContent = newName;
-          outfitDescriptionSpan.textContent = newDescription;
+          if (data.hatImage) {
+            const hatImageContainer = document.getElementById('hat-image-container');
+            const hatImage = document.createElement('img');
+            hatImage.src = data.hatImage;
+            hatImage.alt = 'Hat';
+            hatImage.width = 100;
+            hatImage.height = 100;
+            hatImageContainer.appendChild(hatImage);
+            addRemoveButton(hatImageContainer);
+            hatNameElement.innerHTML = `<a href="${data.hatStoreUrl}" target="_blank">${data.hatTitle}</a>`;
+
+          } else {
+            document.getElementById('hat-name').textContent = 'No product yet';
+          }
+
+          if (data.pantsImage) {
+            const pantsImageContainer = document.getElementById('pants-image-container');
+            console.log('data.pantsImage:', data.pantsImage)
+            pantsImageContainer.dataset.productId = data.pantsId; // Set product ID to the dataset
+            const pantsImage = document.createElement('img');
+            pantsImage.src = data.pantsImage;
+            pantsImage.alt = 'Pants';
+            pantsImage.width = 100;
+            pantsImage.height = 100;
+            pantsImageContainer.appendChild(pantsImage);
+            addRemoveButton(pantsImageContainer);
+            pantsNameElement.innerHTML = `<a href="${data.pantsStoreUrl}" target="_blank">${data.pantsTitle}</a>`;
+          } else {
+            pantsNameElement.textContent = 'No product yet';
+          }
+
+          if (data.topImage) {
+            const topImageContainer = document.getElementById('top-image-container');
+            topImageContainer.dataset.productId = data.topId; // Set product ID to the dataset
+            const topImage = document.createElement('img');
+            topImage.src = data.topImage;
+            topImage.alt = 'Top';
+            topImage.width = 100;
+            topImage.height = 100;
+            topImageContainer.appendChild(topImage);
+            addRemoveButton(topImageContainer);
+            topNameElement.innerHTML = `<a href="${data.topStoreUrl}" target="_blank">${data.topTitle}</a>`;
+          } else {
+            topNameElement.textContent = 'No product yet';
+          }
+
+          if (data.shoeImage) {
+            const shoesImageContainer = document.getElementById('shoes-image-container');
+            shoesImageContainer.dataset.productId = data.shoeId; // Set product ID to the dataset
+            const shoesImage = document.createElement('img');
+            shoesImage.src = data.shoeImage;
+            shoesImage.alt = 'Shoes';
+            shoesImage.width = 100;
+            shoesImage.height = 100;
+            shoesImageContainer.appendChild(shoesImage);
+            addRemoveButton(shoesImageContainer);
+            shoesNameElement.innerHTML = `<a href="${data.shoeStoreUrl}" target="_blank">${data.shoeTitle}</a>`;
+          } else {
+            shoesNameElement.textContent = 'No product yet';
+          }
+
+          if (data.accessoryImage) {
+            const accessoriesImageContainer = document.getElementById('accessories-image-container');
+            accessoriesImageContainer.dataset.productId = data.accessoryId; // Set product ID to the dataset
+            const accessoriesImage = document.createElement('img');
+            accessoriesImage.src = data.accessoryImage;
+            accessoriesImage.alt = 'Accessories';
+            accessoriesImage.width = 100;
+            accessoriesImage.height = 100;
+            accessoriesImageContainer.appendChild(accessoriesImage);
+            addRemoveButton(accessoriesImageContainer);
+            accessoriesNameElement.innerHTML = `<a href="${data.accessoryStoreUrl}" target="_blank">${data.accessoryTitle}</a>`;
+          } else {
+            accessoriesNameElement.textContent = 'No product yet';
+          }
         })
         .catch(error => {
           console.error('Error:', error);
-          // Optionally, provide error feedback to the user
         });
+      removeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          // Extract necessary information
+          const parentOutfitItem = button.closest('.item-image');
+          const productId = parentOutfitItem.dataset.productId; // Get the product ID from the dataset
+
+          console.log('productId:', productId);
+
+          // Send POST request
+          fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/app/pdp/remove', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              customerId,
+              productId,
+            }),
+          })
+            .then(response => response.json())
+            .then(data => {
+              console.log('Product removed:', data);
+              // Optionally, you can provide feedback to the user that the product was successfully removed
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              // Optionally, provide error feedback to the user
+            });
+        });
+      });
+
     });
 
-    console.log('customerId:', {{ customer.id }});
-    fetch('https://{{ shop.domain }}/apps/outfitplaner-hesam/app/outfit?customerId={{customer.id}}', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(response => response.json())
-      .then(data => {
-        const outfitNameElement = document.getElementById('outfit-name');
-        const outfitDescriptionElement = document.getElementById('outfit-description');
-        const pantsNameElement = document.getElementById('pants-name');
-        const topNameElement = document.getElementById('top-name');
-        const shoesNameElement = document.getElementById('shoes-name');
-        const accessoriesNameElement = document.getElementById('accessories-name');
-
-        console.log(data);
-        outfitNameElement.textContent = data.outfitName;
-        outfitDescriptionElement.textContent = data.outfitDescription;
-
-        if (data.hatImage) {
-          const hatImageContainer = document.getElementById('hat-image-container');
-          const hatImage = document.createElement('img');
-          hatImage.src = data.hatImage;
-          hatImage.alt = 'Hat';
-          hatImage.width = 100;
-          hatImage.height = 100;
-          hatImageContainer.appendChild(hatImage);
-        } else {
-          document.getElementById('hat-name').textContent = 'No product yet';
-        }
-
-        if (data.pantsImage) {
-          const pantsImageContainer = document.getElementById('pants-image-container');
-          const pantsImage = document.createElement('img');
-          pantsImage.src = data.pantsImage;
-          pantsImage.alt = 'Pants';
-          pantsImage.width = 100;
-          pantsImage.height = 100;
-          pantsImageContainer.appendChild(pantsImage);
-          pantsNameElement.innerHTML = `<a href="${data.pantsStoreUrl}" target="_blank">${data.pantsTitle}</a>`;
-        } else {
-          pantsNameElement.textContent = 'No product yet';
-        }
-
-        if (data.topImage) {
-          const topImageContainer = document.getElementById('top-image-container');
-          const topImage = document.createElement('img');
-          topImage.src = data.topImage;
-          topImage.alt = 'Top';
-          topImage.width = 100;
-          topImage.height = 100;
-          topImageContainer.appendChild(topImage);
-          topNameElement.innerHTML = `<a href="${data.topStoreUrl}" target="_blank">${data.topTitle}</a>`;
-        } else {
-          topNameElement.textContent = 'No product yet';
-        }
-
-        if (data.shoeImage) {
-          const shoesImageContainer = document.getElementById('shoes-image-container');
-          const shoesImage = document.createElement('img');
-          shoesImage.src = data.shoeImage;
-          shoesImage.alt = 'Shoes';
-          shoesImage.width = 100;
-          shoesImage.height = 100;
-          shoesImageContainer.appendChild(shoesImage);
-          shoesNameElement.innerHTML = `<a href="${data.shoeStoreUrl}" target="_blank">${data.shoeTitle}</a>`;
-        } else {
-          shoesNameElement.textContent = 'No product yet';
-        }
-
-        if (data.accessoryImage) {
-          const accessoriesImageContainer = document.getElementById('accessories-image-container');
-          const accessoriesImage = document.createElement('img');
-          accessoriesImage.src = data.accessoryImage;
-          accessoriesImage.alt = 'Accessories';
-          accessoriesImage.width = 100;
-          accessoriesImage.height = 100;
-          accessoriesImageContainer.appendChild(accessoriesImage);
-          accessoriesNameElement.innerHTML = `<a href="${data.accessoryStoreUrl}" target="_blank">${data.accessoryTitle}</a>`;
-        } else {
-          accessoriesNameElement.textContent = 'No product yet';
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-  });
-
-</script>
+  </script>
 
 
-<style>
-  #outfit-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+
+  {% schema %}
+  {
+    "name": "Outfit",
+    "target": "section",
+    "settings": [
+      { "type": "product", "id": "product", "label": "product", "autofill": true },
+      { "type": "color", "id": "colour", "label": "Star Colour", "default": "#ff0000" }
+    ]
   }
-
-  #outfit-details {
-    flex-basis: 30%;
-    background-color: #f5f5f5;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-
-  #outfit-items {
-    flex-basis: 65%;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 20px;
-  }
-
-  .outfit-item {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .item-image {
-    width: 100%;
-    height: 300px;
-    overflow: hidden;
-    border-radius: 10px;
-  }
-
-  .item-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .outfit-item h3 {
-    margin-top: 10px;
-    font-size: 18px;
-  }
-
-  #hat-image {
-    order: 1;
-  }
-
-  #hat-name {
-    order: 2;
-  }
-
-  #top-image {
-    order: 3;
-  }
-
-  #top-name {
-    order: 4;
-  }
-
-  #pants-image {
-    order: 5;
-  }
-
-  #pants-name {
-    order: 6;
-  }
-
-  #accessories-image {
-    order: 7;
-  }
-
-  #accessories-name {
-    order: 8;
-  }
-
-  #shoes-image {
-    order: 9;
-  }
-
-  #shoes-name {
-    order: 10;
-  }
-</style>
-
-{% schema %}
-{
-  "name": "Outfit",
-  "target": "section",
-  "settings": [
-    { "type": "product", "id": "product", "label": "product", "autofill": true },
-    { "type": "color", "id": "colour", "label": "Star Colour", "default": "#ff0000" }
-  ]
-}
-{% endschema %}
+  {% endschema %}

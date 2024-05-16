@@ -28,6 +28,7 @@ model Outfit {
   id            Int      @id @default(autoincrement())
   name          String   @default("Untitled Outfit")
   description   String   @default("Add a description here!")
+  hatId         String?
   topId         String?
   pantsId       String?
   shoesId       String?

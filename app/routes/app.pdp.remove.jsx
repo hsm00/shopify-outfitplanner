@@ -21,14 +21,14 @@ export const action = async ({ request }) => {
     });
 
     // Set the product IDs from the retrieved outfit
-    const { topId, pantsId, shoesId, accessoriesId } = outfit || {};
+    const { topId, pantsId, shoesId, accessoriesId, hatId } = outfit || {};
 
     // Compare the productId with the outfit's product IDs
     const updatedTopId = productId === topId ? null : topId;
     const updatedPantsId = productId === pantsId ? null : pantsId;
     const updatedShoeId = productId === shoesId ? null : shoesId;
     const updatedAccessoriesId = productId === accessoriesId ? null : accessoriesId;
-
+    const updatedHatId = productId === hatId ? null : hatId;
     // Update the outfit record with the new product IDs
     const updatedOutfit = await db.outfit.updateMany({
       where: {
@@ -42,6 +42,7 @@ export const action = async ({ request }) => {
         pantsId: updatedPantsId,
         shoesId: updatedShoeId,
         accessoriesId: updatedAccessoriesId,
+        hatId: updatedHatId,
       },
     });
     return json({ message: "Product removed from outfit successfully" });

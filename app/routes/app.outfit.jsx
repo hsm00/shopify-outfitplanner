@@ -37,35 +37,40 @@ export const loader = async ({ request }) => {
       },
     });
 
-    const { name, description, topId, pantsId, shoeId, accessoriesId } = outfit || {};
+    const { name, description, topId, pantsId, shoeId, accessoriesId, hatId } = outfit || {};
 
     // Fetch product details concurrently
-    const [top, pants, shoe, accessory] = await Promise.all([
+    const [top, pants, shoe, accessory, hat] = await Promise.all([
       getProductById(admin, topId),
       getProductById(admin, pantsId),
       getProductById(admin, shoeId),
-      getProductById(admin, accessoriesId)
+      getProductById(admin, accessoriesId),
+      getProductById(admin, hatId)
     ]);
 
     return json({
       outfitName: name,
       outfitDescription: description,
-      topId: top?.id,
+      topId: topId,
       topTitle: top?.title,
       topStoreUrl: top?.onlineStorePreviewUrl,
       topImage: top?.featuredImage?.url,
-      pantsId: pants?.id,
+      pantsId: pantsId,
       pantsTitle: pants?.title,
       pantsStoreUrl: pants?.onlineStorePreviewUrl,
       pantsImage: pants?.featuredImage?.url,
-      shoeId: shoe?.id,
+      shoeId: shoeId,
       shoeTitle: shoe?.title,
       shoeStoreUrl: shoe?.onlineStorePreviewUrl,
       shoeImage: shoe?.featuredImage?.url,
-      accessoryId: accessory?.id,
+      accessoryId: accessoriesId,
       accessoryTitle: accessory?.title,
       accessoryStoreUrl: accessory?.onlineStorePreviewUrl,
       accessoryImage: accessory?.featuredImage?.url,
+      hatId: hatId,
+      hatTitle: hat?.title,
+      hatStoreUrl: hat?.onlineStorePreviewUrl,
+      hatImage: hat?.featuredImage?.url,
     });
   } catch (err) {
     console.error(err);
