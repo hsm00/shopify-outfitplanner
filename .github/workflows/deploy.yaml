@@ -1,0 +1,128 @@
+# TODO: Adjust this to your project's requirements.
+name: Deploy via Helm
+
+on:
+  push:
+    branches:
+      - main
+      - acceptance
+
+jobs:
+  env:
+    name: Determine environment
+    runs-on: [ self-hosted, Linux ]
+    outputs:
+      envname: ${{ steps.setvars.outputs.envname }}
+    steps:
+      - name: Set variables
+        id: setvars
+        run: |
+          if [[ "${{ github.base_ref }}" == "main" || "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "envname=prod" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "${{ github.base_ref }}" == "acceptance" || "${{ github.ref }}" == "refs/heads/acceptance" ]]; then
+            echo "envname=stage" >> $GITHUB_OUTPUT
+          fi
+
+  deploy:
+    name: Deploy
+    runs-on: [ self-hosted, Linux ]
+    needs: env
+    environment: ${{ needs.env.outputs.envname }}
+    concurrency: ${{ needs.env.outputs.envname }}
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v3
+
+      - name: Configure 1Password Connect
+        uses: 1password/load-secrets-action/configure@v2
+        with:
+          connect-host: ${{ vars.OP_CONNECT_HOST }}
+          connect-token: ${{ secrets.OP_CONNECT_TOKEN }}
+
+      - name: Load secrets
+        id: secrets
+        uses: 1password/load-secrets-action@v2
+        with:
+          export-env: false
+        env:
+          GH_TOKEN_READ_DEPLOY_REPO: "op://DevOps-CI/Shopify Deploy Repo/Anmeldedaten"
+          SHOPIFY_CLI_PARTNERS_TOKEN: "op://DevOps-CI/Shopify Partners CLI Token/password"
+          REGISTRY_NAME: "op://DevOps-CI/Registry/host"
+          KUBECONFIG: "op://DevOps-CI/kubeconfig/kubeconfig.yml"
+          GRAYLOG_HOST: "op://DevOps-CI/Graylog/host"
+          GRAYLOG_PORT: "op://DevOps-CI/Graylog/port"
+          REGISTRY_USERNAME: "op://${{ vars.OP_PROJECT_VAULT }}/Registry User/username"
+          REGISTRY_PASSWORD: "op://${{ vars.OP_PROJECT_VAULT }}/Registry User/password"
+          SHOPIFY_API_KEY: "op://${{ vars.OP_PROJECT_VAULT }}/Shopify App Hesam Outfit Planner/username"
+          SHOPIFY_API_SECRET: "op://${{ vars.OP_PROJECT_VAULT }}/Shopify App Hesam Outfit Planner/credential"
+
+
+      - name: Checkout deployment Action
+        uses: actions/checkout@v3
+        with:
+          repository: TUDOCK/tudock-shopify-deploy
+          token: ${{ steps.secrets.outputs.GH_TOKEN_READ_DEPLOY_REPO }}
+          ref: v2
+          path: __tudock-shopify-deploy
+
+      # TODO: You may need to replace this with your mechanism.
+      #       prod: use version from package.json
+      - name: Determine version (production)
+        if: needs.env.outputs.envname == 'prod'
+        run: echo "APP_VERSION=$(cat package.json | jq .version -r)" >> $GITHUB_ENV
+        shell: bash
+      #       else: use use dev-<commit hash>
+      - name: Determine version (staging)
+        if: needs.env.outputs.envname != 'prod'
+        run: echo "APP_VERSION=dev-${{ github.sha }}" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Run deployment
+        uses: ./__tudock-shopify-deploy
+        with:
+          # TODO: Replace
+          #deployment-url: https://example.com
+          deployment-envname: "${{ needs.env.outputs.envname }}"
+          github-token: "${{ steps.secrets.outputs.GH_TOKEN_READ_DEPLOY_REPO }}"
+          # TODO: Replace
+          app-release-name: "${{ needs.env.outputs.envname }}-hesam-outfit-shopify-app"
+          # TODO: Replace
+          app-namespace: "${{ needs.env.outputs.envname }}-hesam-outfit-shopify-app"
+          app-version: "${{ env.APP_VERSION }}"
+          # TODO: If you have app extensions, specify this, otherwise you can leave it blank.
+          app-extension-id: "${{ secrets.SHOPIFY_MY_EXTENSION_ID }}"
+          app-api-key: "${{ steps.secrets.outputs.SHOPIFY_API_KEY }}"
+          app-shopify-partner-token: "${{ steps.secrets.outputs.SHOPIFY_CLI_PARTNERS_TOKEN }}"
+          registry-name: "${{ steps.secrets.outputs.REGISTRY_NAME }}"
+          registry-username: "${{ steps.secrets.outputs.REGISTRY_USERNAME }}"
+          registry-password: "${{ steps.secrets.outputs.REGISTRY_PASSWORD }}"
+          image-context: "${{ github.workspace }}"
+          image-build-args: |
+            NODE_ENV=production
+            SHOPIFY_API_KEY=${{ steps.secrets.outputs.SHOPIFY_API_KEY }}
+          # TODO: Replace
+          image-tag: "${{ steps.secrets.outputs.REGISTRY_NAME }}/hesam-outfit-shopify-app:${{ env.APP_VERSION }}"
+          # TODO: Replace this with the path to the chart in your repo, if you choose a different path.
+          chart-path: "${{ github.workspace }}/chart"
+          kubeconfig-file: "${{ steps.secrets.outputs.KUBECONFIG }}"
+          # TODO: You will need to change these, see the README.
+          #          secrets-files: >
+          #            [{
+          #              "secretName": "my-cool-config-file",
+          #              "template": "${{ github.workspace }}/config/my-cool-config-file.json.template",
+          #              "mountAt": "/app/config/my-cool-config-file.json",
+          #              "vars": {
+          #                "KEY_TO_REPLACE": "with this value"
+          #              }
+          #            }]
+          chart-extra-values: |
+            appConfiguration:
+              envs:
+                HOST: https://${{ vars.APP_HOST }}
+                SCOPES: write_products
+                TZ: Europe/Berlin
+                PORT: "8080"
+                SHOPIFY_API_KEY: ${{ steps.secrets.outputs.SHOPIFY_API_KEY }}
+                SHOPIFY_API_SECRET: ${{ steps.secrets.outputs.SHOPIFY_API_SECRET }}

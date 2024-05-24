@@ -1,0 +1,4 @@
+{{- include "tudock-shopify-deploy.app_ingress" (list . "appchart.app_ingress") -}}
+{{- define "appchart.app_ingress" -}}
+{{/* Place your app's overrides for the default here. */}}
+{{- end -}}

@@ -3,7 +3,7 @@
 client_id = "89bd9b490b011c4fbdf1de932d9b9c74"
 name = "outfitplaner-hesam"
 handle = "outfitplanenrhesam"
-application_url = "https://screenshots-turkish-squad-sunday.trycloudflare.com"
+application_url = "https://hudson-evolution-warren-doctrine.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,16 +17,16 @@ scopes = "read_products,write_products"
 
 [auth]
 redirect_urls = [
-  "https://screenshots-turkish-squad-sunday.trycloudflare.com/auth/callback",
-  "https://screenshots-turkish-squad-sunday.trycloudflare.com/auth/shopify/callback",
-  "https://screenshots-turkish-squad-sunday.trycloudflare.com/api/auth/callback"
+  "https://hudson-evolution-warren-doctrine.trycloudflare.com/auth/callback",
+  "https://hudson-evolution-warren-doctrine.trycloudflare.com/auth/shopify/callback",
+  "https://hudson-evolution-warren-doctrine.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
 api_version = "2024-04"
 
 [app_proxy]
-url = "https://screenshots-turkish-squad-sunday.trycloudflare.com"
+url = "https://hudson-evolution-warren-doctrine.trycloudflare.com"
 subpath = "outfitplaner-hesam"
 prefix = "apps"
 

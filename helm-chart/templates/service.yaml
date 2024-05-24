@@ -1,0 +1,4 @@
+{{- include "tudock-shopify-deploy.app_service" (list . "appchart.app_service") -}}
+{{- define "appchart.app_service" -}}
+{{/* Place your app's overrides for the default here. */}}
+{{- end -}}
