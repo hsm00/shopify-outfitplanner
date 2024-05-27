@@ -3,11 +3,14 @@ import db from "../db.server";
 import { apiVersion, authenticate, unauthenticated } from "../shopify.server";
 
 export const action = async ({ request }) => {
-  const shop = "hesams-outfitplanner.myshopify.com";
+  const shop = process.env.SHOP_URL
   const requestData = await request.json();
   const customerId = requestData.customerId;
   const productId = requestData.productId;
   const productType = requestData.productType;
+
+  console.log("productType", productType);
+  console.log("productId", productId);
 
   try {
     const { admin } = await unauthenticated.admin(shop);
@@ -54,6 +57,7 @@ export const action = async ({ request }) => {
         });
         break;
       case "shoe":
+        console.log("shoe");
         outfit = await db.outfit.update({
           where: {
             id: outfit.id,

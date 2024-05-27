@@ -3,7 +3,7 @@
 client_id = "89bd9b490b011c4fbdf1de932d9b9c74"
 name = "outfitplaner-hesam"
 handle = "outfitplanenrhesam"
-application_url = "https://hudson-evolution-warren-doctrine.trycloudflare.com"
+application_url = "https://news-supplied-mpeg-stretch.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,16 +17,16 @@ scopes = "read_products,write_products"
 
 [auth]
 redirect_urls = [
-  "https://hudson-evolution-warren-doctrine.trycloudflare.com/auth/callback",
-  "https://hudson-evolution-warren-doctrine.trycloudflare.com/auth/shopify/callback",
-  "https://hudson-evolution-warren-doctrine.trycloudflare.com/api/auth/callback"
+  "https://news-supplied-mpeg-stretch.trycloudflare.com/auth/callback",
+  "https://news-supplied-mpeg-stretch.trycloudflare.com/auth/shopify/callback",
+  "https://news-supplied-mpeg-stretch.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
 api_version = "2024-04"
 
 [app_proxy]
-url = "https://hudson-evolution-warren-doctrine.trycloudflare.com"
+url = "https://news-supplied-mpeg-stretch.trycloudflare.com"
 subpath = "outfitplaner-hesam"
 prefix = "apps"
 

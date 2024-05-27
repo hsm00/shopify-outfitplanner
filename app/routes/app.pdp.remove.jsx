@@ -3,7 +3,7 @@ import db from "../db.server";
 import { unauthenticated } from "../shopify.server";
 
 export const action = async ({ request }) => {
-  const shop = "hesams-outfitplanner.myshopify.com";
+  const shop = process.env.SHOP_URL;
   const requestData = await request.json();
   const customerId = requestData.customerId;
   const productId = requestData.productId

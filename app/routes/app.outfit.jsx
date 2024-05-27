@@ -5,6 +5,7 @@ import { apiVersion, authenticate, unauthenticated } from "../shopify.server";
 // Function to fetch product details by ID
 const getProductById = async (admin, id) => {
   if (!id) return null; // If ID is not provided, return null
+  console.log(`Fetching product with ID: ${id}`);
   const response = await admin.graphql(`
     query getProductById($id: ID!) {
       product(id: $id) {
@@ -18,11 +19,12 @@ const getProductById = async (admin, id) => {
     }
   `, { variables: { id: `gid://shopify/Product/${id}` } });
   const productJson = await response.json();
+  console.log("Product details fetched successfully" ,productJson.data.product)
   return productJson.data.product;
 };
 
 export const loader = async ({ request }) => {
-  const shop = "hesams-outfitplanner.myshopify.com";
+  const shop = process.env.SHOP_URL
   const url = new URL(request.url);
   const customerId = url.searchParams.get('customerId');
   try {
@@ -37,16 +39,16 @@ export const loader = async ({ request }) => {
       },
     });
 
-    const { name, description, topId, pantsId, shoeId, accessoriesId, hatId } = outfit || {};
+    const { name, description, topId, pantsId, shoesId, accessoriesId, hatId } = outfit || {};
 
     // Fetch product details concurrently
     const [top, pants, shoe, accessory, hat] = await Promise.all([
       getProductById(admin, topId),
       getProductById(admin, pantsId),
-      getProductById(admin, shoeId),
+      getProductById(admin, shoesId),
       getProductById(admin, accessoriesId),
       getProductById(admin, hatId)
-    ]);
+    ])
 
     return json({
       outfitName: name,
@@ -59,7 +61,7 @@ export const loader = async ({ request }) => {
       pantsTitle: pants?.title,
       pantsStoreUrl: pants?.onlineStorePreviewUrl,
       pantsImage: pants?.featuredImage?.url,
-      shoeId: shoeId,
+      shoeId: shoesId,
       shoeTitle: shoe?.title,
       shoeStoreUrl: shoe?.onlineStorePreviewUrl,
       shoeImage: shoe?.featuredImage?.url,
@@ -79,7 +81,7 @@ export const loader = async ({ request }) => {
 };
 
 export const action = async ({ request }) => {
-  const shop = "hesams-outfitplanner.myshopify.com";
+  const shop = process.env.SHOP_URL
   const requestData = await request.json();
   const customerId = requestData.customerId;
   const newName = requestData.newName;

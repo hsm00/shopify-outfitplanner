@@ -1,3 +1,4 @@
+{% if customer %}
   <div>
     <div id="button-container"></div>
     <div id="outfit-preview" style="display: none;">
@@ -33,7 +34,7 @@
     </div>
   </div>
 
-  <style>
+<style>
     .outfit-items-container {
       display: flex;
       align-items: center;
@@ -103,16 +104,18 @@
   </style>
 
   <script>
-    const productId = `{{ product.id }}`;
+    const productId = '{{ product.id }}';
     const productIdRaw = '{{ product.id }}';
     const customerId = '{{ customer.id }}';
 
     document.addEventListener('DOMContentLoaded', () => {
+      fetchOutfitData();
+    });
+
+    function fetchOutfitData() {
       fetch(`https://{{ shop.domain }}/apps/outfitplaner-hesam/app/outfit?customerId=${customerId}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       })
         .then(response => response.json())
         .then(data => {
@@ -125,123 +128,76 @@
             productId === data.pantsId ||
             productId === data.shoeId ||
             productId === data.accessoryId ||
-            productId === data.hatId
+            productId === data.hatId;
 
-          if (isProductInOutfit) {
-            const removeButton = document.createElement('button');
-            removeButton.classList.add('outfit-button', 'remove-from-outfit');
-            removeButton.textContent = 'Remove from Outfit';
-            buttonContainer.appendChild(removeButton);
-
-            removeButton.addEventListener('click', () => {
-              fetch(`https://{{ shop.domain }}/apps/outfitplaner-hesam/app/pdp/remove`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ customerId, productId: productIdRaw }),
-              })
-                .then(response => response.json())
-                .then(data => {
-                  console.log(data.message);
-                  window.location.reload();
-                })
-                .catch(error => {
-                  console.error('Error:', error);
-                });
-            });
-          } else {
-            const addButton = document.createElement('button');
-            addButton.classList.add('outfit-button', 'add-to-outfit');
-            addButton.textContent = 'Add to Outfit';
-            buttonContainer.appendChild(addButton);
-
-            addButton.addEventListener('click', () => {
-              outfitPreview.style.display = 'block';
-              renderOutfitPreview(data);
-            });
-          }
-
-          closePreviewButton.addEventListener('click', () => {
-            outfitPreview.style.display = 'none';
-          });
+          renderButtons(buttonContainer, outfitPreview, isProductInOutfit, data);
+          closePreviewButton.addEventListener('click', () => outfitPreview.style.display = 'none');
         })
-        .catch(error => {
-          console.error('Error:', error);
+        .catch(error => console.error('Error:', error));
+    }
+
+    function renderButtons(buttonContainer, outfitPreview, isProductInOutfit, data) {
+      buttonContainer.innerHTML = '';
+
+      if (isProductInOutfit) {
+        const removeButton = document.createElement('button');
+        removeButton.classList.add('outfit-button', 'remove-from-outfit');
+        removeButton.textContent = 'Remove from Outfit';
+        buttonContainer.appendChild(removeButton);
+
+        removeButton.addEventListener('click', () => {
+          removeFromOutfit(productIdRaw)
+            .then(() => window.location.reload())
+            .catch(error => console.error('Error:', error));
         });
-    });
+      } else {
+        const addButton = document.createElement('button');
+        addButton.classList.add('outfit-button', 'add-to-outfit');
+        addButton.textContent = 'Add to Outfit';
+        buttonContainer.appendChild(addButton);
+
+        addButton.addEventListener('click', () => {
+          outfitPreview.style.display = 'block';
+          renderOutfitPreview(data);
+        });
+      }
+    }
 
     function renderOutfitPreview(data) {
-      const topContainer = document.getElementById('top-container');
-      const pantsContainer = document.getElementById('pants-container');
-      const shoeContainer = document.getElementById('shoe-container');
-      const accessoryContainer = document.getElementById('accessory-container');
-      const hatContainer = document.getElementById('hat-container');
+      const containers = [
+        { id: 'top-container', image: data.topImage, title: 'Top', productId: data.topId },
+        { id: 'pants-container', image: data.pantsImage, title: 'Pants', productId: data.pantsId },
+        { id: 'shoe-container', image: data.shoeImage, title: 'Shoe', productId: data.shoeId },
+        { id: 'accessory-container', image: data.accessoryImage, title: 'Accessory', productId: data.accessoryId },
+        { id: 'hat-container', image: data.hatImage, title: 'Hat', productId: data.hatId },
+      ];
 
-      //render hat
-      const hatImage = hatContainer.querySelector('img');
-      const hatTitle = hatContainer.querySelector('p');
-      if (data.hatImage) {
-        hatImage.src = data.hatImage;
-        hatImage.alt = 'Hat';
-      } else {
-        hatImage.src = 'https://via.placeholder.com/100x100?text=Hat';
-        hatImage.alt = 'Hat Placeholder';
-      }
-      hatTitle.textContent = 'Hat';
-      hatContainer.dataset.productId = data.hatId; // Set product ID to the dataset
+      containers.forEach(({ id, image, title, productId }) => {
+        const container = document.getElementById(id);
+        const productImage = container.querySelector('img');
+        const productTitle = container.querySelector('p');
 
-      // Render top
-      const topImage = topContainer.querySelector('img');
-      const topTitle = topContainer.querySelector('p');
-      if (data.topImage) {
-        topImage.src = data.topImage;
-        topImage.alt = 'Top';
-      } else {
-        topImage.src = 'https://via.placeholder.com/100x100?text=Top';
-        topImage.alt = 'Top Placeholder';
-      }
-      topTitle.textContent = 'Top';
-      topContainer.dataset.productId = data.topId; // Set product ID to the dataset
+        if (image) {
+          productImage.src = image;
+          productImage.alt = title;
+        } else {
+          productImage.src = `https://via.placeholder.com/100x100?text=${title}`;
+          productImage.alt = `${title} Placeholder`;
+        }
 
+        productTitle.textContent = title;
+        container.dataset.productId = productId;
+      });
+    }
 
-      // Render pants
-      const pantsImage = pantsContainer.querySelector('img');
-      const pantsTitle = pantsContainer.querySelector('p');
-      if (data.pantsImage) {
-        pantsImage.src = data.pantsImage;
-        pantsImage.alt = 'Pants';
-      } else {
-        pantsImage.src = 'https://via.placeholder.com/100x100?text=Pants';
-        pantsImage.alt = 'Pants Placeholder';
-      }
-      pantsTitle.textContent = 'Pants';
-      pantsContainer.dataset.productId = data.pantsId; // Set product ID to the dataset
-      // Render shoe
-      const shoeImage = shoeContainer.querySelector('img');
-      const shoeTitle = shoeContainer.querySelector('p');
-      if (data.shoeImage) {
-        shoeImage.src = data.shoeImage;
-        shoeImage.alt = 'Shoe';
-      } else {
-        shoeImage.src = 'https://via.placeholder.com/100x100?text=Shoe';
-        shoeImage.alt = 'Shoe Placeholder';
-      }
-      shoeTitle.textContent = 'Shoe';
-      shoeContainer.dataset.productId = data.shoeId; // Set product ID to the dataset
-
-      // Render accessory
-      const accessoryImage = accessoryContainer.querySelector('img');
-      const accessoryTitle = accessoryContainer.querySelector('p');
-      if (data.accessoryImage) {
-        accessoryImage.src = data.accessoryImage;
-        accessoryImage.alt = 'Accessory';
-      } else {
-        accessoryImage.src = 'https://via.placeholder.com/100x100?text=Accessory';
-        accessoryImage.alt = 'Accessory Placeholder';
-      }
-      accessoryTitle.textContent = 'Accessory';
-      accessoryContainer.dataset.productId = data.accessoryId; // Set product ID to the dataset
+    function removeFromOutfit(productId) {
+      return fetch(`https://{{ shop.domain }}/apps/outfitplaner-hesam/app/pdp/remove`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customerId, productId }),
+      })
+        .then(response => response.json())
+        .then(data => console.log(data.message));
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -250,32 +206,28 @@
       productContainers.forEach(container => {
         container.addEventListener('click', () => {
           const productType = container.dataset.type;
+          console.log('productType', productType);
           addToOutfit(productId, productType);
         });
       });
     });
 
     function addToOutfit(productId, productType) {
-      console.log('Adding product to outfit:', productId);
       fetch(`https://{{ shop.domain }}/apps/outfitplaner-hesam/app/pdp/add`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ customerId, productId, productType}), // Include customer ID and product ID in the body
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customerId, productId, productType }),
       })
         .then(response => response.json())
         .then(data => {
           console.log(data.message);
           window.location.reload();
-          // Optionally, you can update UI or display a message to the user
         })
-        .catch(error => {
-          console.error('Error:', error);
-        });
+        .catch(error => console.error('Error:', error));
     }
   </script>
 
+{% endif %}
   {% schema %}
   {
     "name": "addToButton",
