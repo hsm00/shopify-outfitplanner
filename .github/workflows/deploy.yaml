@@ -48,7 +48,7 @@ jobs:
           export-env: false
         env:
           GH_TOKEN_READ_DEPLOY_REPO: "op://DevOps-CI/Shopify Deploy Repo/Anmeldedaten"
-          SHOPIFY_CLI_PARTNERS_TOKEN: "op://DevOps-CI/Shopify Partners CLI Token/password"
+          SHOPIFY_CLI_PARTNERS_TOKEN: "op://DevOps-CI/Shopify Partners CLI Token/credential"
           REGISTRY_NAME: "op://DevOps-CI/Registry/host"
           KUBECONFIG: "op://DevOps-CI/kubeconfig/kubeconfig.yml"
           GRAYLOG_HOST: "op://DevOps-CI/Graylog/host"
